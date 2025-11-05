@@ -190,6 +190,16 @@ type User struct {
 	Params   map[string]interface{} `json:"params"`
 }
 
+// NotificationOption configures a notification user payload
+type NotificationOption func(*User)
+
+// WithPriority sets the notification priority for the user payload
+func WithPriority(priority string) NotificationOption {
+	return func(u *User) {
+		u.Priority = priority
+	}
+}
+
 // NotificationResponse represents a Yalo notification response
 // The exact structure will depend on Yalo's API response format
 type NotificationResponse struct {
@@ -200,22 +210,26 @@ type NotificationResponse struct {
 }
 
 // SendNotification sends a WhatsApp notification via Yalo to the specified users
-func (c *Client) SendNotification(ctx context.Context, notificationType, phone string, params map[string]interface{}) (*NotificationResponse, error) {
+func (c *Client) SendNotification(ctx context.Context, notificationType, phone string, params map[string]interface{}, opts ...NotificationOption) (*NotificationResponse, error) {
 	if c.AccountID == "" || c.BotID == "" {
 		return nil, fmt.Errorf("accountID and botID are required")
 	}
 
 	endpoint := fmt.Sprintf("/notifications/api/v1/accounts/%s/bots/%s/notifications", c.AccountID, c.BotID)
 
+	user := User{
+		Priority: "1",
+		Phone:    phone,
+		Params:   params,
+	}
+
+	for _, opt := range opts {
+		opt(&user)
+	}
+
 	payload := NotificationRequest{
-		Type: notificationType,
-		Users: []User{
-			{
-				Priority: "high",
-				Phone:    phone,
-				Params:   params,
-			},
-		},
+		Type:  notificationType,
+		Users: []User{user},
 	}
 
 	response, err := c.SendRequestWithPayload(ctx, endpoint, payload)

@@ -31,11 +31,18 @@ func init() {
 func main() {
 	// Check for command line arguments
 	if len(os.Args) < 3 {
-		log.Fatal("Usage: go run main.go <phone_number> <json_params>")
+		log.Fatal("Usage: go run main.go <phone_number> <json_params> [priority]")
 	}
 
 	phoneNumber := os.Args[1]
 	jsonParams := os.Args[2]
+	priority := "1"
+
+	var notificationOptions []yalo.NotificationOption
+	if len(os.Args) >= 4 {
+		priority = os.Args[3]
+		notificationOptions = append(notificationOptions, yalo.WithPriority(priority))
+	}
 
 	// Load configuration from .env file or environment variables
 	accountID := viper.GetString("YALO_ACCOUNT_ID")
@@ -84,12 +91,14 @@ func main() {
 	fmt.Println("=== Sending Notification ===")
 	fmt.Printf("Phone: %s\n", phoneNumber)
 	fmt.Printf("Params: %s\n", jsonParams)
+	fmt.Printf("Priority: %s\n", priority)
 
 	result, err := client.SendNotification(
 		context.Background(),
 		notificationType,
 		phoneNumber,
 		params,
+		notificationOptions...,
 	)
 	if err != nil {
 		log.Fatalf("Error sending notification: %v", err)

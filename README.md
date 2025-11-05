@@ -14,6 +14,7 @@ A Go module for interfacing with the Yalo API to send WhatsApp messages and noti
 - Support for single and multiple user notifications
 - Generic parameter support - works with any WhatsApp template configuration
 - Debug mode for troubleshooting
+- Notification options for customizing delivery priority
 - Clean, simple API
 
 ## Installation
@@ -75,6 +76,8 @@ func main() {
         "your-template-name",
         "+1234567890",
         params,
+        // Optionally override the default priority of "1"
+        yalo.WithPriority("0"),
     )
     if err != nil {
         log.Fatalf("Error: %v", err)
@@ -113,6 +116,7 @@ result, err := client.SendNotification(
     "your-template-name",
     "+1234567890",
     params,
+    yalo.WithPriority("0"),
 )
 ```
 
@@ -250,10 +254,18 @@ Marshals a Go struct to JSON and sends it to a specific Yalo API endpoint.
 ### SendNotification
 
 ```go
-func (c *Client) SendNotification(ctx context.Context, notificationType, phone string, params map[string]interface{}) (*NotificationResponse, error)
+func (c *Client) SendNotification(ctx context.Context, notificationType, phone string, params map[string]interface{}, opts ...NotificationOption) (*NotificationResponse, error)
 ```
 
-Sends a WhatsApp notification to a single user via Yalo. The `params` map should contain key-value pairs matching your WhatsApp template variables.
+Sends a WhatsApp notification to a single user via Yalo. The `params` map should contain key-value pairs matching your WhatsApp template variables. Optional `NotificationOption` values allow advanced control (e.g., delivery priority). When no priority is provided, the client defaults to `"1"`.
+
+### Notification Options
+
+```go
+func WithPriority(priority string) NotificationOption
+```
+
+- `WithPriority`: Overrides the default priority of `"1"` for the notification request.
 
 ### Response Types
 
@@ -278,6 +290,12 @@ The example application demonstrates how to use the Yalo client by accepting a p
 
 ```bash
 cd example
+go run main.go +1234567890 '{"name":"John Doe","param1":"value1","param2":"value2"}' 0
+```
+
+The final argument is optional. If omitted, the client sends the notification with the default priority of `"1"`:
+
+```bash
 go run main.go +1234567890 '{"name":"John Doe","param1":"value1","param2":"value2"}'
 ```
 
