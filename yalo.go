@@ -200,13 +200,11 @@ func WithPriority(priority string) NotificationOption {
 	}
 }
 
-// NotificationResponse represents a Yalo notification response
-// The exact structure will depend on Yalo's API response format
+// NotificationResponse represents the response payload currently returned by Yalo.
 type NotificationResponse struct {
-	Status  string      `json:"status,omitempty"`
-	Message string      `json:"message,omitempty"`
-	Data    interface{} `json:"data,omitempty"`
-	Errors  interface{} `json:"errors,omitempty"`
+	Success    bool     `json:"success"`
+	ID         string   `json:"id"`
+	MessageIDs []string `json:"message_ids"`
 }
 
 // SendNotification sends a WhatsApp notification via Yalo to the specified users

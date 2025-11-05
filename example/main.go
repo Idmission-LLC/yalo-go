@@ -104,10 +104,10 @@ func main() {
 		log.Fatalf("Error sending notification: %v", err)
 	}
 
-	fmt.Printf("\nStatus: %s\n", result.Status)
-	fmt.Printf("Message: %s\n", result.Message)
+	fmt.Printf("\nSuccess: %t\n", result.Success)
+	fmt.Printf("ID: %s\n", result.ID)
+	fmt.Printf("Message IDs: %v\n", result.MessageIDs)
 	prettyBytes, _ := json.MarshalIndent(result, "", "  ")
 	fmt.Println("\nFull Response:")
 	fmt.Println(string(prettyBytes))
-
 }
