@@ -30,17 +30,18 @@ func init() {
 
 func main() {
 	// Check for command line arguments
-	if len(os.Args) < 3 {
-		log.Fatal("Usage: go run main.go <phone_number> <json_params> [priority]")
+	if len(os.Args) < 4 {
+		log.Fatal("Usage: go run main.go <notification_type> <phone_number> <json_params> [priority]")
 	}
 
-	phoneNumber := os.Args[1]
-	jsonParams := os.Args[2]
+	notificationType := os.Args[1]
+	phoneNumber := os.Args[2]
+	jsonParams := os.Args[3]
 	priority := "1"
 
 	var notificationOptions []yalo.NotificationOption
-	if len(os.Args) >= 4 {
-		priority = os.Args[3]
+	if len(os.Args) >= 5 {
+		priority = os.Args[4]
 		notificationOptions = append(notificationOptions, yalo.WithPriority(priority))
 	}
 
@@ -48,7 +49,6 @@ func main() {
 	accountID := viper.GetString("YALO_ACCOUNT_ID")
 	botID := viper.GetString("YALO_BOT_ID")
 	token := viper.GetString("YALO_TOKEN")
-	notificationType := viper.GetString("YALO_NOTIFICATION_TYPE")
 	debug := viper.GetBool("YALO_DEBUG")
 
 	// Set default base URL if not provided
@@ -64,9 +64,6 @@ func main() {
 	}
 	if token == "" {
 		log.Fatal("YALO_TOKEN is required")
-	}
-	if notificationType == "" {
-		log.Fatal("YALO_NOTIFICATION_TYPE is required")
 	}
 
 	// Initialize the Yalo client
@@ -89,6 +86,7 @@ func main() {
 
 	// Send the notification
 	fmt.Println("=== Sending Notification ===")
+	fmt.Printf("Notification Type: %s\n", notificationType)
 	fmt.Printf("Phone: %s\n", phoneNumber)
 	fmt.Printf("Params: %s\n", jsonParams)
 	fmt.Printf("Priority: %s\n", priority)
