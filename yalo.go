@@ -202,9 +202,25 @@ func WithPriority(priority string) NotificationOption {
 
 // NotificationResponse represents the response payload currently returned by Yalo.
 type NotificationResponse struct {
-	Success    bool     `json:"success"`
-	ID         string   `json:"id"`
-	MessageIDs []string `json:"message_ids"`
+	Success    bool                     `json:"success"`
+	ID         string                   `json:"id"`
+	MessageIDs []string                 `json:"message_ids"`
+	Reason     *NotificationErrorReason `json:"reason,omitempty"`
+}
+
+// NotificationErrorReason captures details returned when the Yalo API reports a failure.
+type NotificationErrorReason struct {
+	Description string                    `json:"description"`
+	Error       string                    `json:"error"`
+	Details     []NotificationErrorDetail `json:"details"`
+}
+
+// NotificationErrorDetail provides granular information about why a notification request failed.
+type NotificationErrorDetail struct {
+	Phone       string `json:"phone"`
+	Type        string `json:"type"`
+	Parameter   string `json:"parameter"`
+	Description string `json:"description"`
 }
 
 // SendNotification sends a WhatsApp notification via Yalo to the specified users
